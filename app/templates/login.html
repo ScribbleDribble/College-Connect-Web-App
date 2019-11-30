@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="jumbotron">
+
+            <p>Username</p>
+            {{ form.username }}
+            <p>Password</p>
+            {{ form.password }}
+
+            {{ form.submit }}
+        </div>
+    </div>
+
+{% endblock %}
