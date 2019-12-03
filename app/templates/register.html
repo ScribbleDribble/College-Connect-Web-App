@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Register</h1>
+
+    <div class="jumbotron">
+
+
+        <form method="post">
+            {% with messages = get_flashed_messages() %}
+   {% if messages %}
+     <ul>
+     {% for message in messages %}
+         <li>{{ message }} </li>
+     {% endfor %}
+     </ul>
+   {% endif %}
+ {% endwith %}
+
+            {{ form.hidden_tag() }}
+            <p>Full Name </p>
+            <span id="err"><p>{{ form.name }}</p></span>
+            <p>Username </p>
+            <p>{{ form.username }}</p>
+            <p>Email </p>
+            <p>{{ form.email }}</p>
+            <p>Password</p>
+            <p>{{ form.password }}</p>
+            <p>Age </p>
+            <p>{{ form.age }}</p>
+            <p>University</p>
+            <p>{{ form.university }}</p>
+            <p>Subject </p>
+            <p>{{ form.course }}</p>
+
+            <input value="Register" type="submit" class="btn btn-primary">
+
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

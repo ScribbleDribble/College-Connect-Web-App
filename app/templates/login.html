@@ -5,12 +5,21 @@
     <div class="container">
         <div class="jumbotron">
 
-            <p>Username</p>
-            {{ form.username }}
-            <p>Password</p>
-            {{ form.password }}
+            <form method="post">
 
-            {{ form.submit }}
+                {{form.hidden_tag()}}
+
+                <p>Username</p>
+                <p>{{ form.username }}</p>
+            <p>Password</p>
+            <p>{{ form.password }}</p>
+            <br><br>
+
+            <input type="submit" class="btn btn-primary" value="Sign In">
+            </form>
+
+            <a href="{{url_for('register')}}">Register Here!</a>
+
         </div>
     </div>
 
