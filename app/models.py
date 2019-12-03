@@ -16,14 +16,23 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(15))
     inbox = db.relationship('Message', backref='owner', lazy='dynamic')
 
+# try to avoid duplicating friends when making a query
+class Friends(db.Model):
+    id = db.Column(db.Integer,  db.ForeignKey('user.id'), primary_key=True)
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+
+
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uid_receiver = db.Column(db.Integer, db.ForeignKey('user.id'))
     sender = db.Column(db.String)
-    date_sent = db.Column(db.DateTime)
+    date = db.Column(db.DateTime)
 
-
-
+class Posts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    date = db.Column(db.DateTime)
+    message = db.Column(db.String(120))
 
 # give flask user instance
 @login.user_loader

@@ -28,3 +28,9 @@ class ChangePasswordForm(Form):
     old_password = PasswordField(validators=[DataRequired()])
     new_password = PasswordField(validators=[DataRequired()])
     new_password2 = PasswordField(validators=[DataRequired()])
+
+class PostForm(Form):
+    message = StringField(validators=[DataRequired()])
+
+class FindFriendForm(Form):
+    username = StringField(validators=[DataRequired()])

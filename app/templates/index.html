@@ -2,6 +2,30 @@
 
 {% block content %}
 
-<h1>Welcome {{ current_user.name}}!</h1>
+<div class="container">
+    <div class="jumbotron">
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <p1>Tell us what is happening, {{ current_user.name }}  {{ form.message }}</p1>
+
+            <input type="submit" value="Update">
+        </form>
+    </div>
+
+    {% if friend_count == 0 %}
+    <p>You have no friends xD. <a href="{{url_for('add_friend')}}">Click me</a> to get some!</p>
+    {% else %}
+
+        {% for friend in friends %}
+        <div class="jumbotron">
+            <p> post </p>
+        </div>
+        {% endfor %}
+
+    {% endif %}
+
+</div>
 
 {% endblock %}
+

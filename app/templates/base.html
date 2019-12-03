@@ -26,8 +26,15 @@
           </div>
             {% if current_user.is_authenticated %}
           <ul class="nav navbar-nav">
-              <li>Classroom</li>
-              <li>Message</li>
+              <li>Home</li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Connections
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{url_for('add_friend')}}">Add friend</a></li>
+                    <li><a>Message</a></li>
+                </ul>
+              </li>
               <li><a href="{{ url_for('options')}}">Options</a></li>
               <li><a href="{{ url_for('logout') }}">Logout</a></li>
           </ul>

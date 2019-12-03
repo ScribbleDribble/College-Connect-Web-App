@@ -1,17 +1,21 @@
 from flask import render_template, redirect, flash, url_for
 from flask_login import current_user, login_user, logout_user, LoginManager, login_required, login_manager
 from app import app, db
-from .forms import LoginForm, RegisterForm, ChangePasswordForm
-from .models import User
+from .forms import LoginForm, RegisterForm, ChangePasswordForm, PostForm, FindFriendForm
+from .models import User, Posts, Friends
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import timezone, datetime
+
 
 # in order to make sure users cant access pages unless logged in
 
 
 admin = Admin(app, template_mode='bootstrap3')
 admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Friends, db.session))
+admin.add_view(ModelView(Posts, db.session))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,11 +62,41 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('index.html', current_user=current_user)
+    form = PostForm()
+
+    # get data of users friends 
+    friend_data = Friends.filter_by(current_user.id )
+
+    if form.validate_on_submit():
+        p = Posts(id=Posts.query.count() + 1, sender_id=current_user.id, date=datetime.now(timezone.utc), message=form.message.data)
+        db.session.add(p)
+        db.session.commit()
+
+    return render_template('index.html', current_user=current_user, form=form)
+
+@app.route('/add_friend', methods=['GET', 'POST'])
+@login_required
+def add_friend():
+    form = FindFriendForm()
+    form.password = None
+
+    if form.validate_on_submit():
+        friend = User.query.filter_by(username=form.username.data).first()
+        if friend is None:
+            flash("User was not found")
+            return redirect(url_for('add_friend'))
+
+        f = Friends(id=current_user.id, friend_id=friend.id)
+        db.session.add(f)
+        db.session.commit()
+        flash("You are now friends with" + friend.username)
+        return redirect(url_for('add_friend'))
+
+
+    return render_template('add_friend.html', form=form)
 
 @app.route('/options', methods=['GET', 'POST'])
 @login_required
@@ -70,11 +104,9 @@ def options():
     form = ChangePasswordForm()
 
     if form.validate_on_submit():
-        print("we are here")
-        print(current_user.password)
-        print(form.old_password.data)
+
         if check_password_hash(current_user.password, form.old_password.data):
-            if (form.new_password.data == form.new_password2.data):
+            if form.new_password.data == form.new_password2.data:
                 # generate new hash code for user password
                 current_user.password = generate_password_hash(form.new_password.data)
                 db.session.add(current_user)
