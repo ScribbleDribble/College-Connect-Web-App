@@ -3,7 +3,9 @@
 <head>
 
     <title>{{ title }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ css_path }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename=css_file) }}">
 
 </head>
 <body>

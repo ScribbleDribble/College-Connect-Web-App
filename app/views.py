@@ -8,10 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import timezone, datetime
 
-
 # in order to make sure users cant access pages unless logged in
-
-
 admin = Admin(app, template_mode='bootstrap3')
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Friends, db.session))
@@ -65,17 +62,41 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    css_file = 'css/index.css'
+
+    # get data of users friends in a list format
+    friend_objs = Friends.query.filter_by(friend_id=current_user.id).all()
+    friend_objs = friend_objs + Friends.query.filter_by(id=current_user.id).all()
+    print(friend_objs)
+
+    # the data contained within each post
+    posts = []
+    try:
+        for friend_obj in friend_objs:
+
+            # friend_ids can come under the 'friend_id' or 'id' fields so query for both
+            if not friend_obj.id == current_user.id:
+                posts = posts + Posts.query.filter_by(sender_id=friend_obj.id).all()
+
+            else:
+                posts = posts + Posts.query.filter_by(sender_id=friend_obj.friend_id).all()
+
+    except (Exception):
+        print("no more posts")
+
+    post_segments = []
+
+    for post in posts:
+        post_segments.append((User.query.filter_by(id=post.sender_id).first().name, post.message, post.date))
+
     form = PostForm()
-
-    # get data of users friends 
-    friend_data = Friends.filter_by(current_user.id )
-
     if form.validate_on_submit():
         p = Posts(id=Posts.query.count() + 1, sender_id=current_user.id, date=datetime.now(timezone.utc), message=form.message.data)
         db.session.add(p)
         db.session.commit()
+        return redirect(url_for('index'))
 
-    return render_template('index.html', current_user=current_user, form=form)
+    return render_template('index.html', current_user=current_user, form=form, post_segments=post_segments, css_file=css_file)
 
 @app.route('/add_friend', methods=['GET', 'POST'])
 @login_required
@@ -94,7 +115,6 @@ def add_friend():
         db.session.commit()
         flash("You are now friends with" + friend.username)
         return redirect(url_for('add_friend'))
-
 
     return render_template('add_friend.html', form=form)
 

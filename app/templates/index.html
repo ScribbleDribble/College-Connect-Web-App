@@ -7,24 +7,22 @@
 
         <form method="POST">
             {{ form.hidden_tag() }}
-            <p1>Tell us what is happening, {{ current_user.name }}  {{ form.message }}</p1>
+            <p>Tell us what is happening, {{ current_user.name }} {{ form.message }}</p>
 
-            <input type="submit" value="Update">
+            <input type="submit" value="Post">
         </form>
     </div>
 
-    {% if friend_count == 0 %}
-    <p>You have no friends xD. <a href="{{url_for('add_friend')}}">Click me</a> to get some!</p>
-    {% else %}
+    <p>Posts</p>
+    {% for post_segment in post_segments %}
 
-        {% for friend in friends %}
         <div class="jumbotron">
-            <p> post </p>
+            <img class=".img-thumbnail" alt="{{ post_segment[0] }}'s profile picture" src="{{url_for('static', filename='images/user.png')}}">
+            <p2>{{post_segment[0]}}</p2>
+            <p>{{post_segment[1]}}</p>
+            <p3>{{post_segment[2]}}</p3>
         </div>
-        {% endfor %}
-
-    {% endif %}
-
+    {% endfor %}
 </div>
 
 {% endblock %}
