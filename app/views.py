@@ -1,8 +1,8 @@
 from flask import render_template, redirect, flash, url_for
 from flask_login import current_user, login_user, logout_user, LoginManager, login_required, login_manager
-from app import app, db
-from .forms import LoginForm, RegisterForm, ChangePasswordForm, PostForm, FindFriendForm
-from .models import User, Posts, Friends
+from app import app, db, tasks
+from .forms import LoginForm, RegisterForm, ChangePasswordForm, PostForm, FindFriendForm, MessageForm
+from .models import User, Posts, Friends, Message
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,6 +13,8 @@ admin = Admin(app, template_mode='bootstrap3')
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Friends, db.session))
 admin.add_view(ModelView(Posts, db.session))
+admin.add_view(ModelView(Message, db.session))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -67,7 +69,6 @@ def index():
     # get data of users friends in a list format
     friend_objs = Friends.query.filter_by(friend_id=current_user.id).all()
     friend_objs = friend_objs + Friends.query.filter_by(id=current_user.id).all()
-    print(friend_objs)
 
     # the data contained within each post
     posts = []
@@ -118,6 +119,29 @@ def add_friend():
 
     return render_template('add_friend.html', form=form)
 
+
+@app.route('/message', methods=['GET', 'POST'])
+def message():
+
+    messages = Message.query.filter_by(uid_receiver=current_user.id).all()
+    
+    form = MessageForm()
+    if form.validate_on_submit():
+        receiver = User.query.filter_by(username=form.username.data).first()
+        if receiver is None:
+            flash(form.username + ' was not found')
+            return redirect(url_for('message'))
+
+        tasks.send_messages(current_user, receiver, form)
+        # m = Message(id=Message.query.count() + 1, uid_receiver=receiver.id, sender=current_user.name,
+        #             date=datetime.now(timezone.utc), message=form.message.data)
+        #
+        # db.session.add(m)
+        # db.session.commit()
+        return redirect(url_for('message'))
+
+    return render_template('message.html', form=form, messages=messages)
+
 @app.route('/options', methods=['GET', 'POST'])
 @login_required
 def options():
@@ -138,3 +162,4 @@ def options():
                 return redirect(url_for('options'))
 
     return render_template('options.html', current_user=current_user, form=form)
+

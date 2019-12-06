@@ -2,6 +2,7 @@ from app import login
 from flask_login import UserMixin
 from app import db
 import datetime
+from flask_login import current_user
 
 from werkzeug.security import check_password_hash
 
@@ -27,6 +28,7 @@ class Message(db.Model):
     uid_receiver = db.Column(db.Integer, db.ForeignKey('user.id'))
     sender = db.Column(db.String)
     date = db.Column(db.DateTime)
+    message = db.Column(db.String)
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,3 +41,19 @@ class Posts(db.Model):
 def load_user(id):
     return User.query.get(int(id))
 
+# def load_friends():
+#     friend_objs = Friends.query.filter_by(friend_id=current_user.id).all()
+#     friend_objs = friend_objs + Friends.query.filter_by(id=current_user.id).all()
+#
+#     names = []
+#     for friend_obj in friend_objs:
+#
+#         # friend_ids can come under the 'friend_id' or 'id' fields so query for both
+#         if not friend_obj.id == current_user.id:
+#             name = User.query.filter_by(id=friend_obj.id).first.name()
+#         else:
+#             name = User.query.filter_by(id=friend_obj.friend_id).first.name()
+#
+#         names.append((name, name))
+#
+#     return names

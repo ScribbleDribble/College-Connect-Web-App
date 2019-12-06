@@ -3,8 +3,49 @@
 {% block content %}
 
 <div class="container">
-    <div class="jumbotron">
 
+    <div class="jumbotron">
+        <h2>Send Message</h2>
+
+        <form method="post">
+            {{ form.hidden_tag() }}
+
+            <p>Username(s)</p>
+            <p class="hint">To message multiple with one message, separate each username with a comma</p>
+            <p>{{ form.username }}</p>
+            <p>Message</p>
+            <p>{{ form.message }}</p>
+
+            <input type="submit" value="->">
+        </form>
+
+    </div>
+
+
+    <div class="jumbotron">
+        <h2>Messages</h2>
+    <br>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Sender</th>
+                <th scope="col">Message</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
+            <tr>
+            <th scope="row"></th>
+                <td>{{ message.sender }}</td>
+                <td>{{ message.message }}</td>
+                <td>{{ message.date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+ </div>
     </div>
 </div>
 

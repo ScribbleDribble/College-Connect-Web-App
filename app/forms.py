@@ -1,11 +1,16 @@
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, SelectField, PasswordField, IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email
+from flask_login import current_user
+
 
 
 def validate_age(form, field):
     if field.data < 13:
         raise ValidationError("Invalid age")
+
+
+
 
 class LoginForm(Form):
     username = StringField(validators=[DataRequired()])
@@ -34,3 +39,9 @@ class PostForm(Form):
 
 class FindFriendForm(Form):
     username = StringField(validators=[DataRequired()])
+
+class MessageForm(Form):
+    username = StringField(validators=[DataRequired()])
+    message = StringField(validators=[DataRequired()])
+
+
