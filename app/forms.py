@@ -9,9 +9,6 @@ def validate_age(form, field):
     if field.data < 13:
         raise ValidationError("Invalid age")
 
-
-
-
 class LoginForm(Form):
     username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
@@ -20,7 +17,7 @@ class LoginForm(Form):
 class RegisterForm(Form):
     name = StringField(validators=[DataRequired()])
     username = StringField(validators=[DataRequired()])
-    email = StringField(validators=[DataRequired()])
+    email = StringField(validators=[DataRequired(), Email()])
     age = IntegerField("e.g. 18", validators=[DataRequired(), validate_age])
     university = StringField(validators=[DataRequired()])
     course = SelectField('Course', choices=[('Accounting', 'Accounting'), ('Computer Science', 'Computer Science'),

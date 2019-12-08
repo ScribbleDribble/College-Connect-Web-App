@@ -9,27 +9,43 @@
 
 
         <form method="post">
-            {% with messages = get_flashed_messages() %}
-   {% if messages %}
-     <ul>
-     {% for message in messages %}
-         <li>{{ message }} </li>
-     {% endfor %}
-     </ul>
-   {% endif %}
- {% endwith %}
 
             {{ form.hidden_tag() }}
+
             <p>Full Name </p>
-            <span id="err"><p>{{ form.name }}</p></span>
+            <p>{{ form.name }}</p>
+            {% for error in form.name.errors %}}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+
+
             <p>Username </p>
             <p>{{ form.username }}</p>
+            {% for error in form.username.errors %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+
+
             <p>Email </p>
             <p>{{ form.email }}</p>
+            {% for error in form.email.errors %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+
+
             <p>Password</p>
             <p>{{ form.password }}</p>
+            {% for error in form.password.errors %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+
+
             <p>Age </p>
             <p>{{ form.age }}</p>
+            {% for error in form.age.errors %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+
             <p>University</p>
             <p>{{ form.university }}</p>
             <p>Subject </p>

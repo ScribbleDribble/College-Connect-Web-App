@@ -1,0 +1,9 @@
+#register {
+    background-color: yellow;
+    float: right;
+    padding: 10px;
+}
+
+.error {
+    color: red;
+}

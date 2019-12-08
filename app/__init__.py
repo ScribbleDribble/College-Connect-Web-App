@@ -11,9 +11,7 @@ db = SQLAlchemy(app)
 
 login = LoginManager(app)
 login.login_view = 'login'
-
-login = LoginManager(app)
-
+login.login_message = ' '
 migrate = Migrate(app, db)
 
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])

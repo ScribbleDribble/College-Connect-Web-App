@@ -19,6 +19,8 @@ admin.add_view(ModelView(Message, db.session))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
+    css_file = 'css/login.css'
+
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -27,16 +29,21 @@ def login():
         # will return None if username doesn't exist. good for querying one result
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not check_password_hash(user.password, form.password.data):
+            flash('Invalid username or password')
             return redirect(url_for('login'))
 
         login_user(user)
 
         return redirect(url_for('index'))
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, css_file=css_file)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
+    css_file = 'css/register.css'
+
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -46,14 +53,15 @@ def register():
         if not User.query.filter_by(email=form.email.data).first() is None and not User.query.filter_by(username=form.username.data) is None:
             redirect(url_for('register'))
 
-        u = User(id=User.query.count() + 1, username=form.username.data, name=form.name.data, email=form.email.data, age=form.age.data,
-                 university=form.university.data, course=form.course.data,
+        u = User(id=User.query.count() + 1, username=form.username.data, name=form.name.data, email=form.email.data,
+                 age=form.age.data, university=form.university.data, course=form.course.data,
                  password=(generate_password_hash(form.password.data)))
         db.session.add(u)
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, css_file=css_file)
+
 
 @app.route('/logout')
 @login_required
@@ -61,9 +69,15 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+
     css_file = 'css/index.css'
 
     # get data of users friends in a list format
@@ -82,7 +96,7 @@ def index():
             else:
                 posts = posts + Posts.query.filter_by(sender_id=friend_obj.friend_id).all()
 
-    except (Exception):
+    except Exception:
         print("no more posts")
 
     post_segments = []
@@ -92,12 +106,15 @@ def index():
 
     form = PostForm()
     if form.validate_on_submit():
-        p = Posts(id=Posts.query.count() + 1, sender_id=current_user.id, date=datetime.now(timezone.utc), message=form.message.data)
+        p = Posts(id=Posts.query.count() + 1, sender_id=current_user.id,
+                  date=datetime.now(timezone.utc), message=form.message.data)
         db.session.add(p)
         db.session.commit()
         return redirect(url_for('index'))
 
-    return render_template('index.html', current_user=current_user, form=form, post_segments=post_segments, css_file=css_file)
+    return render_template('index.html', current_user=current_user, form=form,
+                           post_segments=post_segments, css_file=css_file)
+
 
 @app.route('/add_friend', methods=['GET', 'POST'])
 @login_required
@@ -124,23 +141,24 @@ def add_friend():
 def message():
 
     messages = Message.query.filter_by(uid_receiver=current_user.id).all()
-    
+
     form = MessageForm()
     if form.validate_on_submit():
-        receiver = User.query.filter_by(username=form.username.data).first()
-        if receiver is None:
-            flash(form.username + ' was not found')
-            return redirect(url_for('message'))
 
-        tasks.send_messages(current_user, receiver, form)
-        # m = Message(id=Message.query.count() + 1, uid_receiver=receiver.id, sender=current_user.name,
-        #             date=datetime.now(timezone.utc), message=form.message.data)
-        #
-        # db.session.add(m)
-        # db.session.commit()
+        # parse input and iterate through each user, message them if they exist
+        for username in form.username.data.split(','):
+            receiver = User.query.filter_by(username=username).first()
+            if receiver is None:
+                flash(username + ' was not found')
+                return redirect(url_for('message'))
+
+            # each user will be sent a message via a background task
+            tasks.send_messages(current_user, receiver, form.message.data)
+
         return redirect(url_for('message'))
 
     return render_template('message.html', form=form, messages=messages)
+
 
 @app.route('/options', methods=['GET', 'POST'])
 @login_required
@@ -162,4 +180,3 @@ def options():
                 return redirect(url_for('options'))
 
     return render_template('options.html', current_user=current_user, form=form)
-

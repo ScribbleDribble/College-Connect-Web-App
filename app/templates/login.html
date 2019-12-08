@@ -2,15 +2,35 @@
 
 {% block content %}
 
+
+
     <div class="container">
         <div class="jumbotron">
 
+            {% with messages = get_flashed_messages() %}
+   {% if messages %}
+     <ul>
+     {% for message in messages %}
+         <li> <p class="error">{{ message }}</p> </li>
+     {% endfor %}
+     </ul>
+   {% endif %}
+ {% endwith %}
+
+
             <form method="post">
 
-                {{form.hidden_tag()}}
+                {{ form.hidden_tag() }}
+
+                {% if sign_in_fail %}
+                    <p class="error">Invalid username or password</p>
+                {% endif %}
 
                 <p>Username</p>
                 <p>{{ form.username }}</p>
+
+                <div id="register"> <a href="{{url_for('register')}}">Register Here!</a> </div>
+
             <p>Password</p>
             <p>{{ form.password }}</p>
             <br><br>
@@ -18,7 +38,6 @@
             <input type="submit" class="btn btn-primary" value="Sign In">
             </form>
 
-            <a href="{{url_for('register')}}">Register Here!</a>
 
         </div>
     </div>
