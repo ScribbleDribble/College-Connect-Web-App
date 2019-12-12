@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 0799430e54ae
+Revision ID: d27b4df915f0
 Revises: 
-Create Date: 2019-12-05 23:54:42.752916
+Create Date: 2019-12-12 20:38:46.160025
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0799430e54ae'
+revision = 'd27b4df915f0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,20 +22,18 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=15), nullable=True),
     sa.Column('name', sa.String(length=15), nullable=True),
-    sa.Column('email', sa.String(length=15), nullable=True),
+    sa.Column('email', sa.String(length=30), nullable=True),
     sa.Column('age', sa.Integer(), nullable=True),
-    sa.Column('university', sa.String(length=15), nullable=True),
-    sa.Column('password', sa.String(length=15), nullable=True),
+    sa.Column('university', sa.String(length=25), nullable=True),
+    sa.Column('password', sa.String(length=64), nullable=True),
+    sa.Column('is_moderator', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
     op.create_table('friends',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('friend_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['friend_id'], ['user.id'], ),
-    sa.ForeignKeyConstraint(['id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id', 'friend_id')
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], )
     )
     op.create_table('message',
     sa.Column('id', sa.Integer(), nullable=False),

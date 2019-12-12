@@ -4,6 +4,17 @@
 
 <div class="container">
     <div class="jumbotron">
+            {% with messages = get_flashed_messages() %}
+        {% if messages %}
+     <ul>
+             {% for message in messages %}
+             <li> <p class="error">{{ message }}</p> </li>
+             {% endfor %}
+     </ul>
+        {% endif %}
+    {% endwith %}
+
+
         <p>Change Password</p>
 
         <form method="post">
@@ -13,6 +24,25 @@
             <p>Verify new password {{ form.new_password2 }}</p>
             <input type="submit" value="Change">
         </form>
+
+        <br>
+        <br>
+        <br>
+
+        {% if current_user.is_moderator %}
+            <h3><strong>Moderator Options</strong></h3>
+            <p>Delete Account :)</p>
+
+            <form method="post">
+                {{ delete_form.hidden_tag() }}
+
+                <p>Username {{ delete_form.username }}</p>
+                <br>
+                <br>
+                <input class="btn btn-danger" type="submit" value="DELETE">
+            </form>
+
+        {% endif %}
     </div>
 </div>
 
