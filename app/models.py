@@ -8,9 +8,9 @@ from werkzeug.security import check_password_hash
 
 ## users and message thread?
 
-friends = db.Table('friends',
+friends = db.Table('friends', db.Model.metadata,
                    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                   db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
+                   db.Column('friend_id', db.Integer, db.ForeignKey('user.id')))
 
 
 class User(UserMixin, db.Model):
@@ -21,10 +21,10 @@ class User(UserMixin, db.Model):
     age = db.Column(db.Integer)
     university = db.Column(db.String(25))
     course = db.String(db.String)
-    password = db.Column(db.String(64))
+    password = db.Column(db.String(100))
     is_moderator = db.Column(db.Boolean)
     inbox = db.relationship('Message', backref='owner', lazy='dynamic')
-    connections = db.relationship('User', secondary=friends, backref=db.backref('connect', lazy='dynamic'), lazy='dynamic')
+    connections = db.relationship('User', secondary=friends, primaryjoin=(friends.c.user_id == id), secondaryjoin=(friends.c.friend_id == id))
 
 
 # try to avoid duplicating friends when making a query

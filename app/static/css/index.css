@@ -2,3 +2,11 @@
     width: 80px;
 }
 
+.glyphicon-glyphicon-remove {
+    float: right;
+    color: red;
+}
+
+.jumbotron {
+    background-color: #0a4b3e;
+}
