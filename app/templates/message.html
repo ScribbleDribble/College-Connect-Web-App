@@ -5,6 +5,19 @@
 <div class="container">
 
     <div class="jumbotron">
+
+            {% with messages = get_flashed_messages() %}
+        {% if messages %}
+     <ul>
+             {% for message in messages %}
+             <li> <p class="error">{{ message }}</p> </li>
+             {% endfor %}
+     </ul>
+        {% endif %}
+    {% endwith %}
+
+
+
         <h2>Send Message</h2>
 
         <form method="post">

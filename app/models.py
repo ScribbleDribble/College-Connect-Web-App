@@ -6,22 +6,32 @@ from flask_login import current_user
 
 from werkzeug.security import check_password_hash
 
+## users and message thread?
+
+friends = db.Table('friends', db.Model.metadata,
+                   db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+                   db.Column('friend_id', db.Integer, db.ForeignKey('user.id')))
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
     name = db.Column(db.String(15))
-    email = db.Column(db.String(15), unique=True)
+    email = db.Column(db.String(30), unique=True)
     age = db.Column(db.Integer)
-    university = db.Column(db.String(15))
+    university = db.Column(db.String(25))
     course = db.String(db.String)
-    password = db.Column(db.String(15))
+    password = db.Column(db.String(100))
+    is_moderator = db.Column(db.Boolean)
     inbox = db.relationship('Message', backref='owner', lazy='dynamic')
+    connections = db.relationship('User', secondary=friends, primaryjoin=(friends.c.user_id == id), secondaryjoin=(friends.c.friend_id == id))
+
 
 # try to avoid duplicating friends when making a query
-class Friends(db.Model):
-    id = db.Column(db.Integer,  db.ForeignKey('user.id'), primary_key=True)
-    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-
+# class Friends(db.Model):
+#     id = db.Column(db.Integer,  db.ForeignKey('user.id'), primary_key=True)
+#     friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
